@@ -324,13 +324,19 @@ video{
 
 let mode = "text";
 
+/*
+  IMPORTANT:
+  After we deploy the Vercel backend, replace this URL
+  with your actual Vercel deployment URL.
+*/
+const API_BASE_URL = "PASTE_VERCEL_URL_HERE";
+
 function setMode(selected){
 
     mode = selected;
 
     const textMode = document.getElementById("textMode");
     const imageMode = document.getElementById("imageMode");
-
     const textTab = document.getElementById("textTab");
     const imageTab = document.getElementById("imageTab");
 
@@ -353,6 +359,7 @@ function setMode(selected){
     }
 }
 
+
 document.getElementById("imageInput").addEventListener("change", function(){
 
     const file = this.files[0];
@@ -372,7 +379,176 @@ document.getElementById("imageInput").addEventListener("change", function(){
 
 });
 
-function generateVideo(){
+
+function findVideoUrl(data){
+
+    if(!data) return null;
+
+    if(typeof data === "string"){
+        if(data.startsWith("http://") || data.startsWith("https://")){
+            return data;
+        }
+        return null;
+    }
+
+    if(typeof data !== "object") return null;
+
+    const possibleKeys = [
+        "video",
+        "video_url",
+        "videoUrl",
+        "url",
+        "download_url",
+        "downloadUrl",
+        "output"
+    ];
+
+    for(const key of possibleKeys){
+
+        if(data[key]){
+
+            const found = findVideoUrl(data[key]);
+
+            if(found) return found;
+
+        }
+
+    }
+
+    for(const key of Object.keys(data)){
+
+        const found = findVideoUrl(data[key]);
+
+        if(found) return found;
+
+    }
+
+    return null;
+}
+
+
+async function checkVideoStatus(requestId, status, result){
+
+    const maxAttempts = 90;
+
+    for(let attempt = 0; attempt < maxAttempts; attempt++){
+
+        try{
+
+            status.innerHTML =
+                "🎬 Generating your video...<br>" +
+                "Please wait. This can take a few minutes.<br>" +
+                "Checking progress... " + (attempt + 1);
+
+            const response = await fetch(
+                API_BASE_URL +
+                "/api/status?id=" +
+                encodeURIComponent(requestId)
+            );
+
+            const data = await response.json();
+
+            if(!response.ok){
+
+                throw new Error(
+                    data.error || "Unable to check video status."
+                );
+
+            }
+
+            const currentStatus =
+                String(
+                    data.status ||
+                    data.state ||
+                    data.request_status ||
+                    ""
+                ).toLowerCase();
+
+            const videoUrl = findVideoUrl(data);
+
+            if(videoUrl){
+
+                status.innerHTML =
+                    "✅ Your video is ready!";
+
+                result.innerHTML = `
+                    <video
+                        controls
+                        playsinline
+                        style="
+                            width:100%;
+                            max-height:500px;
+                            border-radius:14px;
+                            background:#000;
+                        "
+                    >
+                        <source src="${videoUrl}" type="video/mp4">
+                        Your browser does not support video playback.
+                    </video>
+
+                    <div style="margin-top:15px;">
+                        <a
+                            href="${videoUrl}"
+                            target="_blank"
+                            rel="noopener"
+                            style="
+                                display:inline-block;
+                                padding:12px 20px;
+                                border-radius:10px;
+                                background:#7c5cff;
+                                color:white;
+                                text-decoration:none;
+                                font-weight:bold;
+                            "
+                        >
+                            🎬 Open Video
+                        </a>
+                    </div>
+                `;
+
+                return;
+
+            }
+
+            if(
+                currentStatus.includes("failed") ||
+                currentStatus.includes("error") ||
+                currentStatus.includes("cancel")
+            ){
+
+                throw new Error(
+                    data.error ||
+                    data.message ||
+                    "Video generation failed."
+                );
+
+            }
+
+        }catch(error){
+
+            console.error(error);
+
+            status.innerHTML =
+                "❌ " + error.message;
+
+            return;
+
+        }
+
+        await new Promise(resolve =>
+            setTimeout(resolve, 5000)
+        );
+
+    }
+
+    status.innerHTML =
+        "⏳ The video is taking longer than expected. " +
+        "Please check again shortly.";
+
+}
+
+
+async function generateVideo(){
 
     const status = document.getElementById("status");
     const result = document.getElementById("result");
@@ -381,7 +557,8 @@ function generateVideo(){
 
     if(mode === "text"){
 
-        prompt = document.getElementById("prompt").value.trim();
+        prompt =
+            document.getElementById("prompt").value.trim();
 
         if(!prompt){
 
@@ -392,37 +569,43 @@ function generateVideo(){
 
     }else{
 
-        const image = document.getElementById("imageInput").files[0];
+        alert(
+            "Image to Video will be connected next. " +
+            "For now, please use Text to Video."
+        );
 
-        if(!image){
-
-            alert("Please upload an image first.");
-            return;
-
-        }
-
-        prompt = document.getElementById("imagePrompt").value.trim();
-
-        if(!prompt){
-
-            alert("Please describe how you want the image to move.");
-            return;
-
-        }
+        return;
 
     }
 
-    const duration = document.getElementById("duration").value;
-    const ratio = document.getElementById("ratio").value;
-    const style = document.getElementById("style").value;
+
+    const duration =
+        document.getElementById("duration").value;
+
+    const ratio =
+        document.getElementById("ratio").value;
+
+    const style =
+        document.getElementById("style").value;
+
+
+    if(API_BASE_URL === "PASTE_VERCEL_URL_HERE"){
+
+        status.style.display = "block";
+
+        status.innerHTML =
+            "⚠️ Backend setup is almost complete.<br>" +
+            "We still need to connect your Vercel URL.";
+
+        return;
+
+    }
+
 
     status.style.display = "block";
 
     status.innerHTML =
-        "⏳ Preparing your video...<br>" +
-        "Duration: " + duration + " seconds<br>" +
-        "Format: " + ratio + "<br>" +
-        "Style: " + style;
+        "⏳ Starting video generation...";
 
     result.innerHTML = `
         <div style="
@@ -432,13 +615,105 @@ function generateVideo(){
             border:1px solid #263244;
         ">
             <div style="font-size:45px">🎬</div>
-            <h3>Video generation is ready</h3>
+
+            <h3>Starting your video...</h3>
+
             <p style="color:#9ca3af">
-                Connect an AI video API to this button
-                to generate the actual video.
+                Higgsfield is preparing your video.
             </p>
         </div>
     `;
+
+
+    try{
+
+        const styledPrompt =
+            prompt +
+            "\n\nVisual style: " +
+            style +
+            ".";
+
+
+        const response = await fetch(
+            API_BASE_URL + "/api/generate",
+            {
+                method: "POST",
+
+                headers:{
+                    "Content-Type":"application/json"
+                },
+
+                body:JSON.stringify({
+
+                    prompt: styledPrompt,
+
+                    duration: Number(duration),
+
+                    ratio: ratio
+
+                })
+
+            }
+        );
+
+
+        const data = await response.json();
+
+
+        if(!response.ok){
+
+            throw new Error(
+                data.error ||
+                "Unable to start video generation."
+            );
+
+        }
+
+
+        if(!data.request_id){
+
+            throw new Error(
+                "Higgsfield did not return a request ID."
+            );
+
+        }
+
+
+        await checkVideoStatus(
+            data.request_id,
+            status,
+            result
+        );
+
+
+    }catch(error){
+
+        console.error(error);
+
+        status.style.display = "block";
+
+        status.innerHTML =
+            "❌ " + error.message;
+
+        result.innerHTML = `
+            <div style="
+                padding:35px;
+                border-radius:14px;
+                background:#080d17;
+                border:1px solid #7f1d1d;
+            ">
+                <div style="font-size:45px">⚠️</div>
+
+                <h3>Something went wrong</h3>
+
+                <p style="color:#9ca3af">
+                    ${error.message}
+                </p>
+            </div>
+        `;
+
+    }
+
 }
 
 </script>
