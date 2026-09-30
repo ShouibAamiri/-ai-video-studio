@@ -1,3 +1,5 @@
+import { config, higgsfield } from "@higgsfield/client/v2";
+
 export default async function handler(req, res) {
   // Allow requests from your GitHub Pages website
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -9,11 +11,19 @@ export default async function handler(req, res) {
   }
 
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+    return res.status(405).json({
+      error: "Method not allowed"
+    });
   }
 
   try {
     const { prompt, duration, ratio } = req.body || {};
+
+    if (!process.env.HF_CREDENTIALS) {
+      return res.status(500).json({
+        error: "Higgsfield credentials are not configured."
+      });
+    }
 
     if (!prompt || !prompt.trim()) {
       return res.status(400).json({
@@ -21,55 +31,70 @@ export default async function handler(req, res) {
       });
     }
 
-    const apiKeyId = process.env.HF_API_KEY_ID;
-    const apiKeySecret = process.env.HF_API_KEY_SECRET;
+    const safeDuration = Number(duration) || 5;
 
-    if (!apiKeyId || !apiKeySecret) {
-      return res.status(500).json({
-        error: "Higgsfield API credentials are not configured."
+    if (safeDuration < 4 || safeDuration > 30) {
+      return res.status(400).json({
+        error: "Duration must be between 4 and 30 seconds."
       });
     }
 
-    const response = await fetch(
-      "https://api.higgsfield.ai/bytedance/seedance-2.0/text-to-video",
+    const allowedRatios = [
+      "16:9",
+      "4:3",
+      "1:1",
+      "3:4",
+      "9:16",
+      "21:9"
+    ];
+
+    const aspectRatio = allowedRatios.includes(ratio)
+      ? ratio
+      : "9:16";
+
+    // Configure the official Higgsfield SDK
+    config({
+      credentials: process.env.HF_CREDENTIALS
+    });
+
+    // Generate the video with Seedance 2.5
+    const result = await higgsfield.subscribe(
+      "bytedance/seedance-2.5/text-to-video",
       {
-        method: "POST",
-        headers: {
-          "Authorization": `Key ${apiKeyId}:${apiKeySecret}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
+        input: {
           prompt: prompt.trim(),
-          duration: Number(duration) || 5,
+          duration: safeDuration,
           resolution: "720p",
-          aspect_ratio: ratio || "9:16",
+          aspect_ratio: aspectRatio,
+          output_format: "mp4",
           generate_audio: true
-        })
+        },
+        withPolling: true
       }
     );
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      return res.status(response.status).json({
-        error: data?.message || data?.error || "Higgsfield API request failed.",
-        details: data
+    if (!result || !result.video) {
+      return res.status(502).json({
+        error: "Higgsfield completed the request but did not return a video.",
+        details: result
       });
     }
 
     return res.status(200).json({
       success: true,
-      request_id: data.request_id,
-      status: data.status,
-      status_url: data.status_url
+      video: result.video
     });
 
   } catch (error) {
-    console.error("Higgsfield error:", error);
+    console.error(
+      "Higgsfield generation error:",
+      error?.message || error
+    );
 
     return res.status(500).json({
-      error: "Unable to start video generation.",
-      details: error.message
+      error:
+        error?.message ||
+        "Unable to generate video."
     });
   }
 }
