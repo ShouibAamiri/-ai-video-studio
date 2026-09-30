@@ -6,130 +6,188 @@
 <title>AI Video Studio</title>
 
 <style>
-* {
-  box-sizing: border-box;
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#070b14;
+    color:white;
 }
 
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #090b10;
-  color: white;
+.container{
+    max-width:950px;
+    margin:auto;
+    padding:30px 20px 60px;
 }
 
-.container {
-  max-width: 900px;
-  margin: auto;
-  padding: 25px 18px 50px;
+.header{
+    text-align:center;
+    margin-bottom:30px;
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
+.logo{
+    font-size:32px;
+    font-weight:bold;
 }
 
-.logo {
-  font-size: 24px;
-  font-weight: bold;
+.logo span{
+    color:#7c5cff;
 }
 
-.badge {
-  background: #1c2230;
-  border: 1px solid #303746;
-  padding: 7px 12px;
-  border-radius: 20px;
-  font-size: 12px;
+.subtitle{
+    color:#9ca3af;
+    margin-top:8px;
 }
 
-.card {
-  background: #121620;
-  border: 1px solid #292f3b;
-  border-radius: 18px;
-  padding: 20px;
-  margin-bottom: 18px;
+.card{
+    background:#111827;
+    border:1px solid #263244;
+    border-radius:18px;
+    padding:24px;
+    margin-bottom:20px;
 }
 
-label {
-  display: block;
-  color: #aeb6c7;
-  font-size: 13px;
-  margin-bottom: 8px;
+h2{
+    margin-top:0;
+}
+
+.tabs{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+}
+
+.tab{
+    flex:1;
+    padding:14px;
+    border:1px solid #374151;
+    border-radius:10px;
+    background:#151d2b;
+    color:white;
+    cursor:pointer;
+    font-size:16px;
+}
+
+.tab.active{
+    background:#7c5cff;
+    border-color:#7c5cff;
+}
+
+label{
+    display:block;
+    margin:16px 0 8px;
+    color:#d1d5db;
 }
 
 textarea,
-select {
-  width: 100%;
-  background: #0b0e14;
-  color: white;
-  border: 1px solid #303746;
-  border-radius: 12px;
-  padding: 13px;
-  font-size: 15px;
+select,
+input[type="text"]{
+    width:100%;
+    padding:14px;
+    border-radius:10px;
+    border:1px solid #374151;
+    background:#080d17;
+    color:white;
+    font-size:15px;
 }
 
-textarea {
-  height: 130px;
-  resize: vertical;
+textarea{
+    min-height:130px;
+    resize:vertical;
 }
 
-.options {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-top: 16px;
+.upload{
+    border:2px dashed #374151;
+    border-radius:14px;
+    padding:35px 20px;
+    text-align:center;
+    cursor:pointer;
+    color:#9ca3af;
 }
 
-button {
-  width: 100%;
-  margin-top: 18px;
-  padding: 15px;
-  border: none;
-  border-radius: 12px;
-  background: white;
-  color: #090b10;
-  font-size: 16px;
-  font-weight: bold;
+.upload:hover{
+    border-color:#7c5cff;
 }
 
-button:active {
-  transform: scale(.98);
+.upload input{
+    display:none;
 }
 
-.status {
-  text-align: center;
-  color: #9da7b9;
-  margin-top: 14px;
-  font-size: 13px;
+.preview{
+    display:none;
+    margin-top:20px;
+    text-align:center;
 }
 
-.preview {
-  margin-top: 18px;
-  aspect-ratio: 9 / 16;
-  max-width: 300px;
-  margin-left: auto;
-  margin-right: auto;
-  border: 1px dashed #3a4252;
-  border-radius: 16px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  color: #687286;
-  padding: 20px;
+.preview img{
+    max-width:100%;
+    max-height:350px;
+    border-radius:12px;
 }
 
-.small {
-  color: #7f899c;
-  font-size: 13px;
-  line-height: 1.5;
+.options{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
 }
 
-@media (max-width: 650px) {
-  .options {
-    grid-template-columns: 1fr;
-  }
+.generate{
+    width:100%;
+    margin-top:25px;
+    padding:16px;
+    border:0;
+    border-radius:12px;
+    background:linear-gradient(90deg,#7c5cff,#a855f7);
+    color:white;
+    font-size:18px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.generate:hover{
+    opacity:.9;
+}
+
+.status{
+    margin-top:20px;
+    padding:15px;
+    border-radius:10px;
+    background:#0b1220;
+    color:#9ca3af;
+    display:none;
+}
+
+.video-box{
+    text-align:center;
+}
+
+video{
+    width:100%;
+    max-height:500px;
+    border-radius:14px;
+    background:#000;
+}
+
+.note{
+    font-size:13px;
+    color:#6b7280;
+    margin-top:15px;
+    line-height:1.5;
+}
+
+@media(max-width:650px){
+    .options{
+        grid-template-columns:1fr;
+    }
+
+    .container{
+        padding:20px 14px 40px;
+    }
+
+    .logo{
+        font-size:27px;
+    }
 }
 </style>
 </head>
@@ -138,96 +196,249 @@ button:active {
 
 <div class="container">
 
-  <div class="header">
-    <div class="logo">AI Video Studio</div>
-    <div class="badge">FREE</div>
-  </div>
+    <div class="header">
+        <div class="logo">AI <span>Video Studio</span></div>
+        <div class="subtitle">
+            Create videos from text prompts or images
+        </div>
+    </div>
 
-  <div class="card">
+    <div class="card">
 
-    <label>Describe your video</label>
+        <div class="tabs">
+            <button class="tab active" id="textTab" onclick="setMode('text')">
+                ✨ Text to Video
+            </button>
 
-    <textarea id="prompt"
-      placeholder="Example: A cute fluffy orange cat walking through a magical forest, cinematic lighting..."></textarea>
+            <button class="tab" id="imageTab" onclick="setMode('image')">
+                🖼️ Image to Video
+            </button>
+        </div>
 
-    <div class="options">
+        <div id="textMode">
 
-      <div>
-        <label>Duration</label>
-        <select id="duration">
-          <option>5 seconds</option>
-          <option>10 seconds</option>
-        </select>
-      </div>
+            <label>Describe your video</label>
 
-      <div>
-        <label>Format</label>
-        <select id="format">
-          <option>9:16 Shorts/Reels</option>
-          <option>16:9 YouTube</option>
-          <option>1:1 Square</option>
-        </select>
-      </div>
+            <textarea id="prompt"
+            placeholder="Example: A cute orange kitten walking through a magical forest at sunset, cinematic camera movement, realistic style..."></textarea>
 
-      <div>
+        </div>
+
+        <div id="imageMode" style="display:none">
+
+            <label>Upload an image</label>
+
+            <label class="upload">
+                <input type="file" id="imageInput" accept="image/*">
+                📁 Click to upload an image
+                <br>
+                <small>PNG, JPG or WEBP</small>
+            </label>
+
+            <div class="preview" id="imagePreview">
+                <img id="previewImage">
+            </div>
+
+            <label>Describe the movement</label>
+
+            <textarea id="imagePrompt"
+            placeholder="Example: Make the character slowly walk forward while the camera moves closer..."></textarea>
+
+        </div>
+
+        <div class="options">
+
+            <div>
+                <label>Video Duration</label>
+
+                <select id="duration">
+                    <option value="5">5 seconds</option>
+                    <option value="10">10 seconds</option>
+                    <option value="15">15 seconds</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Aspect Ratio</label>
+
+                <select id="ratio">
+                    <option value="9:16">9:16 — Shorts / Reels</option>
+                    <option value="16:9">16:9 — YouTube</option>
+                    <option value="1:1">1:1 — Instagram</option>
+                </select>
+            </div>
+
+        </div>
+
         <label>Style</label>
+
         <select id="style">
-          <option>Cinematic</option>
-          <option>Realistic</option>
-          <option>3D Animation</option>
-          <option>Anime</option>
+            <option>Cinematic</option>
+            <option>Realistic</option>
+            <option>Anime</option>
+            <option>3D Animation</option>
+            <option>Cartoon</option>
+            <option>Fantasy</option>
         </select>
-      </div>
+
+        <button class="generate" onclick="generateVideo()">
+            🚀 Generate Video
+        </button>
+
+        <div class="status" id="status"></div>
 
     </div>
 
-    <button onclick="generateVideo()">
-      Generate Video
-    </button>
+    <div class="card video-box">
 
-    <div class="status" id="status"></div>
+        <h2>🎬 Your Video</h2>
 
-    <div class="preview" id="preview">
-      Your generated video will appear here.
+        <div id="result">
+            <p style="color:#6b7280">
+                Your generated video will appear here.
+            </p>
+        </div>
+
     </div>
 
-  </div>
+    <div class="card">
 
-  <div class="card">
+        <h2>How it works</h2>
 
-    <h3>My AI Video Generator</h3>
+        <p>1. Choose <b>Text to Video</b> or <b>Image to Video</b>.</p>
+        <p>2. Enter your prompt or upload an image.</p>
+        <p>3. Select duration, ratio and style.</p>
+        <p>4. Click <b>Generate Video</b>.</p>
 
-    <p class="small">
-      Create short AI videos from simple text prompts.
-      Choose your duration, format and visual style.
-    </p>
+        <div class="note">
+            The interface is ready for an AI video-generation API.
+            The actual video generation requires connecting a video AI
+            service to the Generate button.
+        </div>
 
-  </div>
+    </div>
 
 </div>
 
 <script>
 
-function generateVideo() {
+let mode = "text";
 
-  const prompt = document.getElementById("prompt").value.trim();
-  const duration = document.getElementById("duration").value;
-  const format = document.getElementById("format").value;
-  const style = document.getElementById("style").value;
+function setMode(selected){
 
-  const status = document.getElementById("status");
+    mode = selected;
 
-  if (!prompt) {
-    status.innerText = "Please enter a video description first.";
-    return;
-  }
+    const textMode = document.getElementById("textMode");
+    const imageMode = document.getElementById("imageMode");
 
-  status.innerText =
-    "Video settings ready: " +
-    duration + " • " +
-    format + " • " +
-    style;
+    const textTab = document.getElementById("textTab");
+    const imageTab = document.getElementById("imageTab");
 
+    if(selected === "text"){
+
+        textMode.style.display = "block";
+        imageMode.style.display = "none";
+
+        textTab.classList.add("active");
+        imageTab.classList.remove("active");
+
+    }else{
+
+        textMode.style.display = "none";
+        imageMode.style.display = "block";
+
+        textTab.classList.remove("active");
+        imageTab.classList.add("active");
+
+    }
+}
+
+document.getElementById("imageInput").addEventListener("change", function(){
+
+    const file = this.files[0];
+
+    if(!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function(e){
+
+        document.getElementById("previewImage").src = e.target.result;
+        document.getElementById("imagePreview").style.display = "block";
+
+    };
+
+    reader.readAsDataURL(file);
+
+});
+
+function generateVideo(){
+
+    const status = document.getElementById("status");
+    const result = document.getElementById("result");
+
+    let prompt = "";
+
+    if(mode === "text"){
+
+        prompt = document.getElementById("prompt").value.trim();
+
+        if(!prompt){
+
+            alert("Please enter a video prompt.");
+            return;
+
+        }
+
+    }else{
+
+        const image = document.getElementById("imageInput").files[0];
+
+        if(!image){
+
+            alert("Please upload an image first.");
+            return;
+
+        }
+
+        prompt = document.getElementById("imagePrompt").value.trim();
+
+        if(!prompt){
+
+            alert("Please describe how you want the image to move.");
+            return;
+
+        }
+
+    }
+
+    const duration = document.getElementById("duration").value;
+    const ratio = document.getElementById("ratio").value;
+    const style = document.getElementById("style").value;
+
+    status.style.display = "block";
+
+    status.innerHTML =
+        "⏳ Preparing your video...<br>" +
+        "Duration: " + duration + " seconds<br>" +
+        "Format: " + ratio + "<br>" +
+        "Style: " + style;
+
+    result.innerHTML = `
+        <div style="
+            padding:35px;
+            border-radius:14px;
+            background:#080d17;
+            border:1px solid #263244;
+        ">
+            <div style="font-size:45px">🎬</div>
+            <h3>Video generation is ready</h3>
+            <p style="color:#9ca3af">
+                Connect an AI video API to this button
+                to generate the actual video.
+            </p>
+        </div>
+    `;
 }
 
 </script>
