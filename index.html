@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Video Studio</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #090b10;
+  color: white;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 25px 18px 50px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.badge {
+  background: #1c2230;
+  border: 1px solid #303746;
+  padding: 7px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.card {
+  background: #121620;
+  border: 1px solid #292f3b;
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 18px;
+}
+
+label {
+  display: block;
+  color: #aeb6c7;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+textarea,
+select {
+  width: 100%;
+  background: #0b0e14;
+  color: white;
+  border: 1px solid #303746;
+  border-radius: 12px;
+  padding: 13px;
+  font-size: 15px;
+}
+
+textarea {
+  height: 130px;
+  resize: vertical;
+}
+
+.options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+button {
+  width: 100%;
+  margin-top: 18px;
+  padding: 15px;
+  border: none;
+  border-radius: 12px;
+  background: white;
+  color: #090b10;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+button:active {
+  transform: scale(.98);
+}
+
+.status {
+  text-align: center;
+  color: #9da7b9;
+  margin-top: 14px;
+  font-size: 13px;
+}
+
+.preview {
+  margin-top: 18px;
+  aspect-ratio: 9 / 16;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+  border: 1px dashed #3a4252;
+  border-radius: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #687286;
+  padding: 20px;
+}
+
+.small {
+  color: #7f899c;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+@media (max-width: 650px) {
+  .options {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <div class="logo">AI Video Studio</div>
+    <div class="badge">FREE</div>
+  </div>
+
+  <div class="card">
+
+    <label>Describe your video</label>
+
+    <textarea id="prompt"
+      placeholder="Example: A cute fluffy orange cat walking through a magical forest, cinematic lighting..."></textarea>
+
+    <div class="options">
+
+      <div>
+        <label>Duration</label>
+        <select id="duration">
+          <option>5 seconds</option>
+          <option>10 seconds</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Format</label>
+        <select id="format">
+          <option>9:16 Shorts/Reels</option>
+          <option>16:9 YouTube</option>
+          <option>1:1 Square</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Style</label>
+        <select id="style">
+          <option>Cinematic</option>
+          <option>Realistic</option>
+          <option>3D Animation</option>
+          <option>Anime</option>
+        </select>
+      </div>
+
+    </div>
+
+    <button onclick="generateVideo()">
+      Generate Video
+    </button>
+
+    <div class="status" id="status"></div>
+
+    <div class="preview" id="preview">
+      Your generated video will appear here.
+    </div>
+
+  </div>
+
+  <div class="card">
+
+    <h3>My AI Video Generator</h3>
+
+    <p class="small">
+      Create short AI videos from simple text prompts.
+      Choose your duration, format and visual style.
+    </p>
+
+  </div>
+
+</div>
+
+<script>
+
+function generateVideo() {
+
+  const prompt = document.getElementById("prompt").value.trim();
+  const duration = document.getElementById("duration").value;
+  const format = document.getElementById("format").value;
+  const style = document.getElementById("style").value;
+
+  const status = document.getElementById("status");
+
+  if (!prompt) {
+    status.innerText = "Please enter a video description first.";
+    return;
+  }
+
+  status.innerText =
+    "Video settings ready: " +
+    duration + " • " +
+    format + " • " +
+    style;
+
+}
+
+</script>
+
+</body>
+</html>
